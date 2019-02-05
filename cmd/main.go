@@ -19,6 +19,7 @@ func main() {
 	bulkSize, _ := strconv.Atoi(Env("ELASTIC_SEARCH_BULK_SIZE", "500"))
 	stream := Stream(ch, "events", "es-writer-log", []string{routingKey}, bulkSize)
 	esIndex := Env("ELASTIC_SEARCH_LOG_INDEX", "es-writer-log")
+	docType := Env("ELASTIC_SEARCH_LOG_DOC_TYPE", "bulk-request")
 
 	cfg, _ := config.Parse(Env("ELASTIC_SEARCH_URL", "http://localhost:9200/?sniff=false"))
 	es, _ := elastic.NewClientFromConfig(cfg)
