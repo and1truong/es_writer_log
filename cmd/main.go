@@ -4,14 +4,15 @@ import (
 	"context"
 	"strconv"
 
-	. "github.com/andytruong/es_writer_loguong/es_writer_log"
+	. "github.com/andytruong/es_writer_log"
+
 	"gopkg.in/olivere/elastic.v5"
 	"gopkg.in/olivere/elastic.v5/config"
 )
 
 func main() {
 	ctx := context.Background()
-	queueUrl := Env("RABBITMQ_URL", "")
+	queueUrl := En("RABBITMQ_URL", "")
 	con, _ := Connection(queueUrl)
 	ch := Channel(con, "topic", "events")
 	routingKey := Env("RABBITMQ_ROUTING_KEY", "")
