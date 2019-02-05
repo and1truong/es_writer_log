@@ -16,9 +16,9 @@ func main() {
 	con, _ := Connection(queueUrl)
 	ch := Channel(con, "topic", "events")
 	routingKey := Env("RABBITMQ_ROUTING_KEY", "")
-	bulkSize, _ := strconv.Atoi(Env("BULK_SIZE", "500"))
+	bulkSize, _ := strconv.Atoi(Env("ELASTIC_SEARCH_BULK_SIZE", "500"))
 	stream := Stream(ch, "events", "es-writer-log", []string{routingKey}, bulkSize)
-	esIndex := Env("ES_LOG_INDEX", "es-writer-log")
+	esIndex := Env("ELASTIC_SEARCH_LOG_INDEX", "es-writer-log")
 
 	cfg, _ := config.Parse(Env("ELASTIC_SEARCH_URL", "http://localhost:9200/?sniff=false"))
 	es, _ := elastic.NewClientFromConfig(cfg)
