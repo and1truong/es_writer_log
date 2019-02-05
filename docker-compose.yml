@@ -1,0 +1,13 @@
+version: "2"
+services:
+  app:
+    image:     ${CI_REGISTRY_IMAGE}:${CI_BUILD_REF_NAME}
+    mem_limit: $MEM
+    environment:
+      - ENVIRONMENT
+      - RABBITMQ_URL
+      - RABBITMQ_ROUTING_KEY
+      - ELASTIC_SEARCH_URL
+      - ELASTIC_SEARCH_LOG_INDEX=es-writer-log
+      - ELASTIC_SEARCH_LOG_DOC_TYPE=bulk-request
+      - ELASTIC_SEARCH_BULK_SIZE=500
