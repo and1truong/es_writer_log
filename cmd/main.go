@@ -12,7 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	queueUrl := En("RABBITMQ_URL", "")
+	queueUrl := Env("RABBITMQ_URL", "")
 	con, _ := Connection(queueUrl)
 	ch := Channel(con, "topic", "events")
 	routingKey := Env("RABBITMQ_ROUTING_KEY", "")
@@ -29,7 +29,7 @@ func main() {
 		r := elastic.
 			NewBulkIndexRequest().
 			Index(esIndex).
-			Type("bulk-request").
+			Type(docType).
 			Doc(m.Body)
 
 		bulk.Add(r)

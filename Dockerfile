@@ -4,7 +4,6 @@ WORKDIR   /es_writer_log/
 COPY    . /es_writer_log/
 
 RUN cd /es_writer_log/
-RUN ls -lah ./
 RUN go mod vendor
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app cmd/main.go
 
