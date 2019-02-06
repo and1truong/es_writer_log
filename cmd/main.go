@@ -28,7 +28,7 @@ func main() {
 	esUrl := Env("ELASTIC_SEARCH_URL", "http://localhost:9200/?sniff=false")
 	esIndex := Env("ELASTIC_SEARCH_LOG_INDEX", "es-writer-log")
 	docType := Env("ELASTIC_SEARCH_LOG_DOC_TYPE", "bulk-request")
-	
+
 	cfg, _ := config.Parse(esUrl)
 	es, err := elastic.NewClientFromConfig(cfg)
 	if err != nil {
@@ -39,20 +39,19 @@ func main() {
 
 	for m := range stream {
 		payload := Payload{}
-
 		if err := json.Unmarshal(m.Body, &payload); err != nil {
-			panic(err)
+			continue
 		}
 
-		uuid := uuid.New()
-		r := elastic.
-			NewBulkIndexRequest().
-			Index(esIndex).
-			Type(docType).
-			Id(uuid.String()).
-			Doc(payload)
+		bulk = bulk.Add(
+			elastic.
+				NewBulkIndexRequest().
+				Index(esIndex).
+				Type(docType).
+				Id(uuid.New().String()).
+				Doc(payload),
+		)
 
-		bulk = bulk.Add(r)
 		if bulkSize == bulk.NumberOfActions() {
 			bulk.Do(ctx)
 			ch.Ack(m.DeliveryTag, true)
