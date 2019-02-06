@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"strconv"
+
+	. "github.com/andytruong/es_writer_log"
 	"github.com/google/uuid"
+
 	"gopkg.in/olivere/elastic.v5"
 	"gopkg.in/olivere/elastic.v5/config"
-	"strconv"
-	. "github.com/andytruong/es_writer_log"
 )
 
 type Payload struct {
@@ -23,10 +25,11 @@ func main() {
 	routingKey := Env("RABBITMQ_ROUTING_KEY", "")
 	bulkSize, _ := strconv.Atoi(Env("ELASTIC_SEARCH_BULK_SIZE", "500"))
 	stream := Stream(ch, "events", "es-writer-log", []string{routingKey}, bulkSize)
+	esUrl := Env("ELASTIC_SEARCH_URL", "http://localhost:9200/?sniff=false")
 	esIndex := Env("ELASTIC_SEARCH_LOG_INDEX", "es-writer-log")
 	docType := Env("ELASTIC_SEARCH_LOG_DOC_TYPE", "bulk-request")
-
-	cfg, _ := config.Parse(Env("ELASTIC_SEARCH_URL", "http://localhost:9200/?sniff=false"))
+	
+	cfg, _ := config.Parse(esUrl)
 	es, err := elastic.NewClientFromConfig(cfg)
 	if err != nil {
 		panic("failed to connect elastic search")
