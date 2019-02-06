@@ -5,17 +5,12 @@ import (
 	"encoding/json"
 	"strconv"
 
-	. "github.com/andytruong/es_writer_log"
 	"github.com/google/uuid"
+	. "github.com/andytruong/es_writer_log"
 
 	"gopkg.in/olivere/elastic.v5"
 	"gopkg.in/olivere/elastic.v5/config"
 )
-
-type Payload struct {
-	Body string `json:"body"`
-	Uri  string `json:"uri"`
-}
 
 func main() {
 	ctx := context.Background()
@@ -38,7 +33,7 @@ func main() {
 	bulk := es.Bulk()
 
 	for m := range stream {
-		payload := Payload{}
+		payload := map[string]interface{}{}
 		if err := json.Unmarshal(m.Body, &payload); err != nil {
 			continue
 		}
