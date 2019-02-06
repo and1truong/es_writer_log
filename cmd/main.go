@@ -2,13 +2,18 @@ package main
 
 import (
 	"context"
-	"strconv"
-
-	. "github.com/andytruong/es_writer_log"
-
+	"encoding/json"
+	"github.com/google/uuid"
 	"gopkg.in/olivere/elastic.v5"
 	"gopkg.in/olivere/elastic.v5/config"
+	"strconv"
+	. "github.com/andytruong/es_writer_log"
 )
+
+type Payload struct {
+	Body string `json:"body"`
+	Uri  string `json:"uri"`
+}
 
 func main() {
 	ctx := context.Background()
@@ -22,18 +27,29 @@ func main() {
 	docType := Env("ELASTIC_SEARCH_LOG_DOC_TYPE", "bulk-request")
 
 	cfg, _ := config.Parse(Env("ELASTIC_SEARCH_URL", "http://localhost:9200/?sniff=false"))
-	es, _ := elastic.NewClientFromConfig(cfg)
+	es, err := elastic.NewClientFromConfig(cfg)
+	if err != nil {
+		panic("failed to connect elastic search")
+	}
+
 	bulk := es.Bulk()
 
 	for m := range stream {
+		payload := Payload{}
+
+		if err := json.Unmarshal(m.Body, &payload); err != nil {
+			panic(err)
+		}
+
+		uuid := uuid.New()
 		r := elastic.
 			NewBulkIndexRequest().
 			Index(esIndex).
 			Type(docType).
-			Doc(m.Body)
+			Id(uuid.String()).
+			Doc(payload)
 
-		bulk.Add(r)
-
+		bulk = bulk.Add(r)
 		if bulkSize == bulk.NumberOfActions() {
 			bulk.Do(ctx)
 			ch.Ack(m.DeliveryTag, true)
